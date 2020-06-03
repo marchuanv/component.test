@@ -1,0 +1,26 @@
+{
+  "name": "component.delegate",
+  "version": "1.0.0",
+  "description": "delegating function calls with retry policies",
+  "main": "component.delegate.js",
+  "engines": {
+    "node": "12.16.1",
+    "npm": "6.13.4"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marchuanv/component.delegate.git"
+  },
+  "author": "Marchuan Van Der Merwe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/marchuanv/component.delegate/issues"
+  },
+  "homepage": "https://github.com/marchuanv/component.delegate#readme",
+  "dependencies": {
+    "logging": "git+https://github.com/marchuanv/logging.git"
+  }
+}

@@ -3,11 +3,11 @@ logging.config.add("Delegating");
 module.exports = { 
     retry: 0,
     call: async (callingFunc, rollbackFunc, params) => {
-        if (typeof callingFunc !== 'function'){
+        if (!callingFunc || typeof callingFunc !== 'function'){
             logging.write("Delegating", `expected parameter 'callingFunc' to be a function`);
             return;
         }
-        if (typeof rollbackFunc !== 'function'){
+        if (rollbackFunc && typeof rollbackFunc !== 'function'){
             logging.write("Delegating", `expected parameter 'rollbackFunc' to be a function`);
             return;
         }

@@ -27,7 +27,7 @@ module.exports = {
                 logging.write("Delegating", `${rollbackFunc.name} failed with: ${err.message}.`);
                 return;
             }
-            module.exports.call(callingFunc, rollbackFunc, params);
+            return module.exports.call(callingFunc, rollbackFunc, params);
         } else if (error) {
             logging.write("Delegating", `${callingFunc.name} failed with: ${error.message}.`);
             throw error;

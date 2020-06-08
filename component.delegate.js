@@ -2,6 +2,10 @@ const logging = require("logging");
 logging.config.add("Delegating");
 module.exports = { 
     retry: 0,
+    pointers: [],
+    create: (moduleName, callback, callbackRetry) => {
+        pointers.push({ moduleName, callback, callbackRetry });
+    },
     call: async (callingFunc, rollbackFunc, params) => {
         if (!callingFunc || typeof callingFunc !== 'function'){
             logging.write("Delegating", `expected parameter 'callingFunc' to be a function`);

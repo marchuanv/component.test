@@ -3,31 +3,19 @@ logging.config.add("Delegating");
 module.exports = { 
     retry: 0,
     pointers: [],
-    register: ( moduleName, callingModuleName, callback ) => {
-        const pointer = module.exports.pointers.find(mod => mod.name === moduleName && mod.dependancy === callingModuleName);
+    register: ( context, func ) => {
+        const pointer = module.exports.pointers.find(p => p.context === context);
         if (pointer){
-            pointer.call = callback;
+            pointer.func = func;
         } else {
-            module.exports.pointers.push({ 
-                name: moduleName, 
-                dependancy: callingModuleName,
-                call: callback
-            });
+            module.exports.pointers.push({ context, func });
         }
     },
-    registerRetry: ( moduleName, callingModuleName, callback ) => {
-        const pointer = module.exports.pointers.find(mod => mod.name === moduleName && mod.dependancy === callingModuleName);
-        if (pointer){
-            pointer.retry = callback;
-        } else {
-            module.exports.pointers.push({ 
-                name: moduleName, 
-                dependancy: callingModuleName,
-                retry: callback
-            });
-        }
-    },
-    call: async (callingFunc, params) => {
+    call: async (context, params) => {
+
+        const pointer = module.exports.pointers.find(p => p.context === context);
+        const callingFunc =  pointer.func;
+
         if (!callingFunc || typeof callingFunc !== 'function'){
             logging.write("Delegating", `expected parameter 'callingFunc' to be a function`);
             return;

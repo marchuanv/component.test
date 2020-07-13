@@ -37,7 +37,7 @@ module.exports = {
             return module.exports.call(context, params);
         } else if (error) {
             logging.write("Delegating", `${callingFunc.name} failed with: ${error.message}.`);
-            throw error;
+            return error;
         }
     }
 };

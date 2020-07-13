@@ -14,12 +14,17 @@ module.exports = {
     call: async (context, params) => {
 
         const pointer = module.exports.pointers.find(p => p.context === context);
-        const callingFunc =  pointer.func;
+        if (!pointer){
+            logging.write("Delegating", `no pointers found for the ${context} module.`);
+            return;
+        }
 
+        const callingFunc =  pointer.func;
         if (!callingFunc || typeof callingFunc !== 'function'){
             logging.write("Delegating", `expected parameter 'callingFunc' to be a function`);
             return;
         }
+
         let error;
         try {
             return await callingFunc(params);
@@ -29,7 +34,7 @@ module.exports = {
         if (error && module.exports.retry <= 2 ){
             module.exports.retry = module.exports.retry + 1;
             logging.write("Delegating", `${callingFunc.name} error after ${module.exports.retry} retries.`);
-            return module.exports.call(callingFunc, params);
+            return module.exports.call(context, params);
         } else if (error) {
             logging.write("Delegating", `${callingFunc.name} failed with: ${error.message}.`);
             throw error;

@@ -42,7 +42,7 @@ module.exports = {
             logging.write("Delegating", `${callingFunc.name} error after ${module.exports.retry} retries.`);
             return module.exports.call(context, params);
         } else if (error) {
-            logging.write("Delegating", `${callingFunc.name} failed with: ${error.message}.`);
+            logging.write("Delegating", `${callingFunc.name} failed with: ${error.message || error}.`);
             return { error };
         }
     }

@@ -29,7 +29,9 @@ module.exports = {
         let results;
         try {
             results = await callingFunc(params);
-            error = results.error;
+            if (results){
+                error = results.error;
+            }
         } catch (err) {
             error = err;
         }

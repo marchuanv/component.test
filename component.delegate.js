@@ -26,8 +26,10 @@ module.exports = {
         }
 
         let error;
+        let results;
         try {
-            return await callingFunc(params);
+            results = await callingFunc(params);
+            error = results.error;
         } catch (err) {
             error = err;
         }

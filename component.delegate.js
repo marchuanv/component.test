@@ -29,22 +29,34 @@ module.exports = {
 
         let results = [];
         for(const callback of callbacks.filter(c => c.name === name || !name)){
-            let error;
+            let error = "";
             try {
                 const result = await callback.func(params);
-                results.push( { name: callback.name, result, isError: false });
+                if (result){
+                    results.push( { name: callback.name, result, error, success: true });
+                } else {
+                    results.push( { name: callback.name, result, error, success: false });
+                }
             } catch (err) {
                 error = err;
             }
             if (error && module.exports.retry <= 2 ){
                 module.exports.retry = module.exports.retry + 1;
                 logging.write("Delegating", `${callback.name} error after ${module.exports.retry} retries.`);
-                results = results.concat(await module.exports.call( { context, name: callback.name }, params));
+                const result = await module.exports.call( { context, name: callback.name }, params);
+                if (result){
+                    results.push( { name: callback.name, result, error, success: false });
+                }
             } else if (error) {
                 logging.write("Delegating", `${callback.name} failed with: ${error.message || error}.`);
-                results.push( { name: callback.name, result: error, isError: true });
+                results.push( { name: callback.name, result: null, error, success: false });
             }
         }
-        return results;
+
+        results = results.filter(x => x.success);
+        if (results.length > 1){
+            throw new Error(`functions registered for ${context} returned more than one valid results`);
+        }
+        return results[0]? results[0].result: null;
     }
 };

@@ -15,14 +15,16 @@ module.exports = {
 
         const pointer = module.exports.pointers.find(p => p.context === context);
         if (!pointer){
-            logging.write("Delegating", `no pointers found for the ${context} module.`);
-            return;
+            const error = `no pointers found for the ${context} module.`;
+            logging.write("Delegating", error);
+            return { error };
         }
 
         const callingFunc =  pointer.func;
         if (!callingFunc || typeof callingFunc !== 'function'){
-            logging.write("Delegating", `expected parameter 'callingFunc' to be a function`);
-            return;
+            const error = `expected parameter 'callingFunc' to be a function`;
+            logging.write("Delegating",error);
+            return { error };
         }
 
         let error;

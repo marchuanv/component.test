@@ -3,15 +3,15 @@ logging.config.add("Delegating");
 module.exports = { 
     retry: 0,
     pointers: [],
-    register: ( context, func ) => {
+    register: ( context, name, callback ) => {
         const pointer = module.exports.pointers.find(p => p.context === context);
         if (pointer){
-            pointer.func = func;
+            pointer.callbacks.push( { name, func: callback });
         } else {
-            module.exports.pointers.push({ context, func });
+            module.exports.pointers.push({ context, callbacks: [ { name, func: callback }] });
         }
     },
-    call: async (context, params) => {
+    call: async ( { context, name }, params) => {
 
         const pointer = module.exports.pointers.find(p => p.context === context);
         if (!pointer){
@@ -20,32 +20,31 @@ module.exports = {
             return { error };
         }
 
-        const callingFunc =  pointer.func;
-        if (!callingFunc || typeof callingFunc !== 'function'){
-            const error = `expected parameter 'callingFunc' to be a function`;
+        const callbacks =  pointer.callbacks;
+        if (!callbacks || !Array.isArray(callbacks)){
+            const error = `expected pointer 'callbacks' to be an array`;
             logging.write("Delegating",error);
             return { error };
         }
 
-        let error;
-        let results;
-        try {
-            results = await callingFunc(params);
-            if (results && results.error){
-                error = results.error;
-            } else if (results && !results.error){
-               return results;
+        let results = [];
+        for(const callback of callbacks.filter(c => c.name === name || !name)){
+            let error;
+            try {
+                const result = await callback.func(params);
+                results.push( { name: callback.name, result });
+            } catch (err) {
+                error = err;
             }
-        } catch (err) {
-            error = err;
+            if (error && module.exports.retry <= 2 ){
+                module.exports.retry = module.exports.retry + 1;
+                logging.write("Delegating", `${callback.name} error after ${module.exports.retry} retries.`);
+                results = results.concat(module.exports.call( { context, name: callback.name }, params));
+            } else if (error) {
+                logging.write("Delegating", `${callback.name} failed with: ${error.message || error}.`);
+                results.push( { name: callback.name, error });
+            }
         }
-        if (error && module.exports.retry <= 2 ){
-            module.exports.retry = module.exports.retry + 1;
-            logging.write("Delegating", `${callingFunc.name} error after ${module.exports.retry} retries.`);
-            return module.exports.call(context, params);
-        } else if (error) {
-            logging.write("Delegating", `${callingFunc.name} failed with: ${error.message || error}.`);
-            return { error };
-        }
+        return results;
     }
 };

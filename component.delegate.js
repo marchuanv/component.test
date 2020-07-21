@@ -60,8 +60,12 @@ module.exports = {
         await Promise.all(filteredCallbacks.map(c => c.result));
         await Promise.all(filteredCallbacks.map(c => c.error));
 
-        const results = filteredCallbacks.filter(r => r.result).map(r => r.result);
-        const errors = filteredCallbacks.filter(r => r.error).map(r => r.error);
+        const filteredCallbacksCloned = JSON.parse(JSON.stringify(filteredCallbacks));
+        filteredCallbacks.forEach(x => x.result = null );
+        filteredCallbacks.forEach(x => x.error = null );
+
+        const results = filteredCallbacksCloned.filter(r => r.result).map(r => r.result);
+        const errors = filteredCallbacksCloned.filter(r => r.error).map(r => r.error);
 
         if (results.length > 1 || errors.length > 1 || (results.length  + errors.length) > 1 ){
             if (errors.length > 0){

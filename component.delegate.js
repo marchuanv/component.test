@@ -71,7 +71,11 @@ module.exports = {
             if (errors.length > 0){
                 return errors[0];
             }
-            return new Error(`expected at most one of all the functions registered for "${context}" to return results`);
+            const error = new Error(`expected at most one of all the functions registered for "${context}" to return results`);
+            return {
+                message: error.message,
+                stack: error.stack,
+            }
         }
 
         if (errors.length !== 0){

@@ -60,15 +60,18 @@ module.exports = {
         await Promise.all(filteredCallbacks.map(c => c.result));
         await Promise.all(filteredCallbacks.map(c => c.error));
 
-        const results = filteredCallbacks.filter(x => x.result);
-        const errors = filteredCallbacks.filter(r => r.error);
+        const results = filteredCallbacks.filter(r => r.result).map(r => r.result);
+        const errors = filteredCallbacks.filter(r => r.error).map(r => r.error);
 
         if (results.length > 1 || errors.length > 1 || (results.length  + errors.length) > 1 ){
+            if (errors.length > 0){
+                return errors[0];
+            }
             return new Error(`expected at most one of all the functions registered for "${context}" to return results`);
         }
 
         if (errors.length !== 0){
-            return errors.filter(r => r.error).map(r => r.error)[0];
+            return errors[0];
         }
       
         return results[0]? results[0].result: null;

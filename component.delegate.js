@@ -64,7 +64,7 @@ module.exports = {
         const errors = filteredCallbacks.filter(r => r.error);
 
         if (results.length > 1 || errors.length > 1 || (results.length  + errors.length) > 1 ){
-            throw new Error(`expected at most one of all the functions registered for "${context}" to return results`);
+            return new Error(`expected at most one of all the functions registered for "${context}" to return results`);
         }
 
         if (errors.length !== 0){

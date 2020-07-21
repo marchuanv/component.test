@@ -74,6 +74,6 @@ module.exports = {
             return errors[0];
         }
       
-        return results[0]? results[0].result: null;
+        return results[0];
     }
 };

@@ -14,8 +14,7 @@ module.exports = {
                     func: callback, 
                     retry: 1, 
                     timeout: 500,
-                    result: null,
-                    error: null
+                    result: null
                 }]
             });
         }
@@ -26,14 +25,14 @@ module.exports = {
         if (!pointer){
             const error = `no pointers found for the ${context} module.`;
             logging.write("Delegating", error);
-            return new Error(error);
+            return  { result: new Error(error)};
         }
 
         const callbacks =  pointer.callbacks;
         if (!callbacks || !Array.isArray(callbacks)){
             const error = `expected pointer 'callbacks' to be an array`;
             logging.write("Delegating",error);
-            return new Error(error);
+            return  { result: new Error(error)};
         }
 
         const filteredCallbacks = callbacks.filter(c => c.name === name || !name);
@@ -42,11 +41,9 @@ module.exports = {
                 callback.result = await callback.func(params);
                 callback.timeout = 500;
                 callback.retry = 1;
-                callback.error = null;
             } catch (error) {
                 logging.write("Delegating", `${callback.name} failed with: ${error.message || error}, retrying ${callback.retry} of 3`);
-                callback.result = null;
-                callback.error = error;
+                callback.result = error;
                 if (callback.retry <= 2){
                     callback.retry = callback.retry + 1;
                     setTimeout(async () => {
@@ -57,27 +54,25 @@ module.exports = {
             }
         }
 
+        //Errors before promises resolved
+        for(const errorResult of filteredCallbacks.filter(cb => cb.result && cb.result.message && cb.result.stack)){
+            return errorResult;
+        };
+
         await Promise.all(filteredCallbacks.map(c => c.result));
-        await Promise.all(filteredCallbacks.map(c => c.error));
 
         const filteredCallbacksCloned = JSON.parse(JSON.stringify(filteredCallbacks));
         filteredCallbacks.forEach(x => x.result = null );
-        filteredCallbacks.forEach(x => x.error = null );
 
-        const results = filteredCallbacksCloned.filter(r => r.result).map(r => r.result);
-        const errors = filteredCallbacksCloned.filter(r => r.error).map(r => r.error);
+        //Errors after promises resolved
+        for(const errorResult of filteredCallbacksCloned.filter(cb => cb.result && cb.result.message && cb.result.stack)){
+            return errorResult;
+        };
 
-        if (results.length > 1 || errors.length > 1 || (results.length  + errors.length) > 1 ){
-            if (errors.length > 0){
-                return errors[0];
-            }
-            return new Error(`expected at most one of all the functions registered for "${context}" to return results`);
+        if (filteredCallbacksCloned.filter(cb => cb.result).length > 1){
+            return {result: new Error(`expected at most one of all the functions registered for "${context}" to return results`)};
         }
 
-        if (errors.length !== 0){
-            return errors[0];
-        }
-      
-        return results[0];
+        return filteredCallbacksCloned.find(cb => cb.result);
     }
 };

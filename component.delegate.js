@@ -44,7 +44,9 @@ module.exports = {
         const filteredCallbacks = callbacks.filter(c => c.name === name || !name);
         for(const callback of filteredCallbacks){
             try {
+                logging.write("Delegating", "invoking callback");
                 callback.result = await callback.func(params);
+                logging.write("Delegating", "callback invoked");
                 callback.timeout = 500;
                 callback.retry = 1;
             } catch (error) {

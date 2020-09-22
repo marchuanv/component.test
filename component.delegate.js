@@ -3,6 +3,9 @@ logging.config.add("Delegating");
 module.exports = { 
     pointers: [],
     register: ( context, name, callback ) => {
+        if (!context || !name){
+             return logging.write("Delegating", "failed to register, no context or name provided.");
+        }
         const pointer = module.exports.pointers.find(p => p.context === context);
         if (pointer){
             pointer.callbacks.push( { name, func: callback });
@@ -21,7 +24,9 @@ module.exports = {
         }
     },
     call: async ( { context, name }, params) => {
-
+        if (!context || !name){
+             return logging.write("Delegating", "failed to invoke callback, no context or name provided.");
+        }
         const pointer = module.exports.pointers.find(p => p.context === context);
         if (!pointer){
             const error = `no pointers found for the ${context} module.`;

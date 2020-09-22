@@ -24,8 +24,8 @@ module.exports = {
         }
     },
     call: async ( { context, name }, params) => {
-        if (!context || !name){
-             return logging.write("Delegating", "failed to invoke callback, no context or name provided.");
+        if (!context){
+             return logging.write("Delegating", "failed to invoke callback, no context provided.");
         }
         const pointer = module.exports.pointers.find(p => p.context === context);
         if (!pointer){

@@ -5,6 +5,7 @@ module.exports = {
     register: ( context, name, callback ) => {
         const pointer = module.exports.pointers.find(p => p.context === context);
         if (pointer){
+            logging.write("Delegating", `Registered ${name} callback on ${context}`);
             pointer.callbacks.push( { name, func: callback });
         } else {
             module.exports.pointers.push({ 

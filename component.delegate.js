@@ -63,13 +63,15 @@ module.exports = {
                 callback.timeout = callback.timeout * 2;
             }
         }
-
+        
         //Errors before promises resolved
         for(const errorResult of filteredCallbacks.filter(cb => cb.result && cb.result.message && cb.result.stack)){
             return errorResult.result;
         };
 
         await Promise.all(filteredCallbacks.map(c => c.result));
+        
+        logging.write("Delegating", "all callbacks invoked");
 
         const filteredCallbacksCloned = JSON.parse(JSON.stringify(filteredCallbacks));
         filteredCallbacks.forEach(x => x.result = null );

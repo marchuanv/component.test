@@ -71,7 +71,7 @@ module.exports = {
 
         await Promise.all(filteredCallbacks.map(c => c.result));
         
-        logging.write("Delegating", "all callbacks invoked");
+        logging.write("Delegating", "callback(s) invoked");
 
         const filteredCallbacksCloned = JSON.parse(JSON.stringify(filteredCallbacks));
         filteredCallbacks.forEach(x => x.result = null );

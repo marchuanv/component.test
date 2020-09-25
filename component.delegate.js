@@ -26,7 +26,7 @@ module.exports = {
     call: async ( { context, name }, params) => {
         if (!context){
              const error = "failed to invoke callback, no context provided.";
-             return logging.write("Delegating", error);
+             logging.write("Delegating", error);
              return new Error(error);
         }
         const pointer = module.exports.pointers.find(p => p.context === context);
@@ -44,6 +44,12 @@ module.exports = {
         }
 
         const filteredCallbacks = callbacks.filter(c => c.name === name || !name);
+        if (filteredCallbacks.length === 0){
+            const error = `no callbacks`;
+            logging.write("Delegating", error);
+            return new Error(error);
+        }
+
         for(const callback of filteredCallbacks){
             try {
                 logging.write("Delegating", "invoking callback");

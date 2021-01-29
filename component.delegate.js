@@ -45,10 +45,7 @@ module.exports = {
 
         const filteredCallbacks = callbacks.filter(c => c.name === name || !name);
         if (filteredCallbacks.length === 0){
-            let error = `no callbacks`;
-            if (name){
-                error = `no callbacks for ${name}`;
-            }
+            const error = `no callbacks`;
             logging.write("Delegating", error);
             return new Error(error);
         }

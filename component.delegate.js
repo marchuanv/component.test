@@ -11,7 +11,6 @@ module.exports = {
             if (pointer.callbacks.find(p => p.name === name)){
                 const message =  `${name} is already registered on the ${context}`;
                 logging.write("Delegating", message);
-                throw new Error(message);
             } else {
                 pointer.callbacks.push( { name, func: callback });
             }

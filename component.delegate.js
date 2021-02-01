@@ -8,13 +8,15 @@ module.exports = {
         }
         const pointer = module.exports.pointers.find(p => p.context === context);
         if (pointer){
-            pointer.callbacks.push( { name, func: callback });
+            const lastPriority = pointer.callbacks.sort((a, b) => b.priority - a.priority)[0].priority;
+            pointer.callbacks.push( { name, func: callback, priority: lastPriority + 1 });
         } else {
             module.exports.pointers.push({ 
                 context, 
                 callbacks: [{ 
                     name, 
-                    func: callback, 
+                    func: callback,
+                    priority: 1,
                     retry: 1, 
                     timeout: 500,
                     result: null
@@ -91,7 +93,7 @@ module.exports = {
             return new Error(`expected at most one of all the functions registered for "${context}" to return results`);
         }
 
-        const firstCallbackWithResult = filteredCallbacksCloned.find(cb => cb.result);
+        const firstCallbackWithResult = filteredCallbacksCloned.filter(cb => cb.result).sort((a, b) => b.priority - a.priority)[0];
         return  firstCallbackWithResult? firstCallbackWithResult.result : null;
     }
 };

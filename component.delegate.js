@@ -23,7 +23,7 @@ module.exports = {
             logging.write("Delegating", `Registered ${name} callback on ${context}`);
         }
     },
-    call: async ( { context, name }, params) => {
+    call: async ( { context, name, wildcard }, params) => {
         if (!context){
              const error = "failed to invoke callback, no context provided.";
              logging.write("Delegating", error);
@@ -43,7 +43,7 @@ module.exports = {
             return  new Error(error);
         }
 
-        const filteredCallbacks = callbacks.filter(c => c.name === name || !name);
+        const filteredCallbacks = callbacks.filter(c => c.name.startsWith(wildcard) || ( (wildcard === undefined || wildcard === "") && (c.name === name || !name )) );
         if (filteredCallbacks.length === 0){
             const error = `no callbacks`;
             logging.write("Delegating", error);

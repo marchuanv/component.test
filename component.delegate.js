@@ -18,7 +18,8 @@ module.exports = {
                     retry: 1, 
                     timeout: 500,
                     result: null
-                }]
+                }],
+                callbackCounter: 0
             });
             logging.write("Delegating", `Registered ${name} callback on ${context}`);
         }

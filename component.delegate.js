@@ -4,17 +4,17 @@ const fs = require("fs");
 const callstackFile = `${__dirname}/callstack.json`;
 let stack = [];
 
-process.on('SIGTERM', () => {
-    console.info('SIGTERM signal received.');
+const terminate = () => {
     console.log('saving callstack.');
     fs.writeFileSync(callstackFile,JSON.stringify(stack,null,4));
-});
+};
 
-process.on('exit', () => {
-    console.info('exit signal received.');
-    console.log('saving callstack.');
-    fs.writeFileSync(callstackFile,JSON.stringify(stack,null,4));
-});
+process.on('SIGTERM', () => terminate() );
+process.on('exit', () => terminate() );
+process.on('SIGINT', () => terminate() );
+process.on('SIGUSR1', () => terminate() );
+process.on('SIGUSR2', () => terminate() );
+process.on('uncaughtException', () => terminate() );
 
 module.exports = { 
     pointers: [],

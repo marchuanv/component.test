@@ -27,7 +27,7 @@ componentDelegate.register(callingModule2, "RandomFunction4", () => {
 
     const prom2 = new Promise(async (resolve) => {
         const parameters = {};
-        const results = await componentDelegate.call( { context: callingModule2, wildcard: "Function" }, parameters);
+        const results = await componentDelegate.call( { context: callingModule2, wildcard: "RandomFunction" }, parameters);
         setTimeout(resolve,2000);
     });
     await prom2;

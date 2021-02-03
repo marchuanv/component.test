@@ -1,5 +1,21 @@
 const logging = require("logging");
 logging.config.add("Delegating");
+const fs = require("fs");
+const callstackFile = `${__dirname}/callstack.json`;
+let stack = [];
+
+process.on('SIGTERM', () => {
+    console.info('SIGTERM signal received.');
+    console.log('saving callstack.');
+    fs.writeFileSync(callstackFile,JSON.stringify(stack,null,4));
+});
+
+process.on('exit', () => {
+    console.info('exit signal received.');
+    console.log('saving callstack.');
+    fs.writeFileSync(callstackFile,JSON.stringify(stack,null,4));
+});
+
 module.exports = { 
     pointers: [],
     register: ( context, name, callback ) => {
@@ -8,17 +24,11 @@ module.exports = {
         }
         const pointer = module.exports.pointers.find(p => p.context === context);
         if (pointer){
-            pointer.callbacks.push( { name, func: callback });
+            pointer.callbacks.push( { name, func: callback, retry: 1, timeout: 500, result: null });
         } else {
             module.exports.pointers.push({ 
                 context, 
-                callbacks: [{ 
-                    name, 
-                    func: callback, 
-                    retry: 1, 
-                    timeout: 500,
-                    result: null
-                }],
+                callbacks: [{ name, func: callback, retry: 1, timeout: 500, result: null }],
                 callbackCounter: 0
             });
             logging.write("Delegating", `Registered ${name} callback on ${context}`);
@@ -55,6 +65,8 @@ module.exports = {
             try {
                 logging.write("Delegating", "invoking callback");
                 pointer.callbackCounter = pointer.callbackCounter + 1;
+                const stackItem = { context, name: callback.name, retry: callback.retry, date: new Date() };
+                stack.push(stackItem);
                 callback.result = await callback.func(params);
                 logging.write("Delegating", "callback invoked");
                 callback.timeout = 500;

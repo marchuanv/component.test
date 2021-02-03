@@ -49,10 +49,11 @@ module.exports = {
             logging.write("Delegating", error);
             return new Error(error);
         }
-
+      
         for(const callback of filteredCallbacks){
             try {
                 logging.write("Delegating", "invoking callback");
+                pointer.callbackCounter = pointer.callbackCounter + 1;
                 callback.result = await callback.func(params);
                 logging.write("Delegating", "callback invoked");
                 callback.timeout = 500;
@@ -68,8 +69,10 @@ module.exports = {
                 }
                 callback.timeout = callback.timeout * 2;
             }
-        }
+        };
         
+        pointer.callbackCounter = 0;
+
         //Errors before promises resolved
         for(const errorResult of filteredCallbacks.filter(cb => cb.result && cb.result.message && cb.result.stack)){
             return errorResult.result;
@@ -93,5 +96,9 @@ module.exports = {
 
         const firstCallbackWithResult = filteredCallbacksCloned.find(cb => cb.result);
         return  firstCallbackWithResult? firstCallbackWithResult.result : null;
+    },
+    callbackCount: async ( { context }) => {
+        const pointer = module.exports.pointers.find(p => p.context === context);
+        return pointer.callbackCounter;
     }
 };

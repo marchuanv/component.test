@@ -21,7 +21,7 @@ const locks = [];
 
 module.exports = {
     pointers: [],
-    register: ( context, name, callback, overwriteExisting = false ) => {
+    register: ( context, name, callback, overwriteExisting = true ) => {
         if (!context || !name){
              return logging.write("Delegating", "failed to register, no context or name provided.");
         }

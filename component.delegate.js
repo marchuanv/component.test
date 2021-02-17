@@ -1,4 +1,5 @@
 const logging = require("logging");
+const utils = require("utils");
 logging.config.add("Delegating");
 const fs = require("fs");
 const callstackFile = `${__dirname}/callstack.json`;
@@ -15,6 +16,8 @@ process.on('SIGINT', () => terminate() );
 process.on('SIGUSR1', () => terminate() );
 process.on('SIGUSR2', () => terminate() );
 process.on('uncaughtException', () => terminate() );
+
+const locks = [];
 
 module.exports = { 
     pointers: [],
@@ -35,15 +38,35 @@ module.exports = {
         }
     },
     call: async ( { context, name, wildcard }, params) => {
+        
+        const contextLockName = context || "global";
+        let contextLock = locks.find(x => x.context === contextLockName);
+        if (!contextLock) {
+            contextLock = { isLocked: true, context: contextLockName };
+            locks.push(contextLock);
+        } else if (!contextLock.isLocked) {
+            contextLock.isLocked = true;
+        } else {
+            return new Promise((resolve)=> {
+                setTimeout(async () => {
+                    const results = await module.exports.call( { context, name, wildcard }, params);
+                    resolve(results);
+                }, 1000);
+            });
+        }
+
         if (!context){
              const error = "failed to invoke callback, no context provided.";
              logging.write("Delegating", error);
+             contextLock.isLocked = false
              return new Error(error);
         }
+        
         const pointer = module.exports.pointers.find(p => p.context === context);
         if (!pointer){
             const error = `no pointers found for the ${context} module.`;
             logging.write("Delegating", error);
+            contextLock.isLocked = false
             return new Error(error);
         }
 
@@ -51,6 +74,7 @@ module.exports = {
         if (!callbacks || !Array.isArray(callbacks)){
             const error = `expected pointer 'callbacks' to be an array`;
             logging.write("Delegating",error);
+            contextLock.isLocked = false
             return  new Error(error);
         }
 
@@ -58,6 +82,7 @@ module.exports = {
         if (filteredCallbacks.length === 0){
             const error = `no callbacks`;
             logging.write("Delegating", error);
+            contextLock.isLocked = false
             return new Error(error);
         }
       
@@ -77,7 +102,7 @@ module.exports = {
                 if (callback.retry <= 2){
                     callback.retry = callback.retry + 1;
                     setTimeout(async () => {
-                        await module.exports.call( { context, name: callback.name }, params);
+                        await module.exports.call( { context, name: callback.name, wildcard }, params);
                     }, callback.timeout);
                 }
                 callback.timeout = callback.timeout * 2;
@@ -88,6 +113,7 @@ module.exports = {
 
         //Errors before promises resolved
         for(const errorResult of filteredCallbacks.filter(cb => cb.result && cb.result.message && cb.result.stack)){
+            contextLock.isLocked = false
             return errorResult.result;
         };
 
@@ -100,12 +126,16 @@ module.exports = {
 
         //Errors after promises resolved
         for(const errorResult of filteredCallbacksCloned.filter(cb => cb.result && cb.result.message && cb.result.stack)){
+            contextLock.isLocked = false
             return errorResult.result;
         };
 
         if (filteredCallbacksCloned.filter(cb => cb.result).length > 1){
+            contextLock.isLocked = false
             return new Error(`expected at most one of all the functions registered for "${context}" to return results`);
         }
+
+        contextLock.isLocked = false
 
         const firstCallbackWithResult = filteredCallbacksCloned.find(cb => cb.result);
         return  firstCallbackWithResult? firstCallbackWithResult.result : null;

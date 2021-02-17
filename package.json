@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/marchuanv/component.delegate#readme",
   "dependencies": {
-    "logging": "git+https://github.com/marchuanv/logging.git"
+    "logging": "git+https://github.com/marchuanv/logging.git",
+    "utils": "git+https://github.com/marchuanv/utils.git"
   }
 }

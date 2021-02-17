@@ -31,8 +31,7 @@ module.exports = {
         } else {
             module.exports.pointers.push({ 
                 context, 
-                callbacks: [{ name, func: callback, retry: 1, timeout: 500, result: null }],
-                callbackCounter: 0
+                callbacks: [{ name, func: callback, retry: 1, timeout: 500, result: null }]
             });
             logging.write("Delegating", `Registered ${name} callback on ${context}`);
         }
@@ -89,7 +88,6 @@ module.exports = {
         for(const callback of filteredCallbacks){
             try {
                 logging.write("Delegating", "invoking callback");
-                pointer.callbackCounter = pointer.callbackCounter + 1;
                 const stackItem = { context, name: callback.name, retry: callback.retry, date: new Date() };
                 stack.push(stackItem);
                 callback.result = await callback.func(params);
@@ -108,8 +106,6 @@ module.exports = {
                 callback.timeout = callback.timeout * 2;
             }
         };
-        
-        pointer.callbackCounter = 0;
 
         //Errors before promises resolved
         for(const errorResult of filteredCallbacks.filter(cb => cb.result && cb.result.message && cb.result.stack)){
@@ -139,9 +135,5 @@ module.exports = {
 
         const firstCallbackWithResult = filteredCallbacksCloned.find(cb => cb.result);
         return  firstCallbackWithResult? firstCallbackWithResult.result : null;
-    },
-    callbackCount: async ( { context }) => {
-        const pointer = module.exports.pointers.find(p => p.context === context);
-        return pointer.callbackCounter;
     }
 };

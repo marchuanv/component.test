@@ -19,14 +19,19 @@ process.on('uncaughtException', () => terminate() );
 
 const locks = [];
 
-module.exports = { 
+module.exports = {
     pointers: [],
-    register: ( context, name, callback ) => {
+    register: ( context, name, callback, overwriteExisting = false ) => {
         if (!context || !name){
              return logging.write("Delegating", "failed to register, no context or name provided.");
         }
         const pointer = module.exports.pointers.find(p => p.context === context);
         if (pointer){
+            if (overwriteExisting){
+                logging.write("Delegating", `Overwriting existing ${name} callback on ${context}`);
+                const duplicateCallbackIndex = pointer.callbacks.findIndex(x => x.name === name);
+                pointer.callbacks.splice(duplicateCallbackIndex,1);
+            }
             pointer.callbacks.push( { name, func: callback, retry: 1, timeout: 500, result: null });
         } else {
             module.exports.pointers.push({ 
@@ -35,12 +40,6 @@ module.exports = {
             });
             logging.write("Delegating", `Registered ${name} callback on ${context}`);
         }
-    },
-    unregister: ( context, name ) => {
-        if (!context || !name){
-             return logging.write("Delegating", "failed to unregister, no context or name provided.");
-        }
-        module.exports.pointers = module.exports.pointers.filter(p => p.context !== context);
     },
     call: async ( { context, name, wildcard }, params) => {
         

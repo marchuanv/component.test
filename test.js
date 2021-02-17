@@ -15,6 +15,9 @@ componentDelegate.register(callingModule2, "RandomFunction3", () => {
 componentDelegate.register(callingModule2, "RandomFunction4", () => {
     return "Success";
 });
+componentDelegate.register(callingModule2, "RandomFunction4", () => {
+    return "Success";
+}, true );
 
 
 (async() => {

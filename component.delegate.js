@@ -36,6 +36,12 @@ module.exports = {
             logging.write("Delegating", `Registered ${name} callback on ${context}`);
         }
     },
+    unregister: ( context, name ) => {
+        if (!context || !name){
+             return logging.write("Delegating", "failed to unregister, no context or name provided.");
+        }
+        module.exports.pointers = module.exports.pointers.filter(p => p.context !== context);
+    },
     call: async ( { context, name, wildcard }, params) => {
         
         const contextLockName = context || "global";

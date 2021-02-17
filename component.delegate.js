@@ -30,7 +30,9 @@ module.exports = {
             if (overwriteExisting){
                 logging.write("Delegating", `Overwriting existing ${name} callback on ${context}`);
                 const duplicateCallbackIndex = pointer.callbacks.findIndex(x => x.name === name);
-                pointer.callbacks.splice(duplicateCallbackIndex,1);
+                if (duplicateCallbackIndex > -1){
+                    pointer.callbacks.splice(duplicateCallbackIndex,1);
+                }
             }
             pointer.callbacks.push( { name, func: callback, retry: 1, timeout: 500, result: null });
         } else {

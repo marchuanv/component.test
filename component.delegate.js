@@ -25,6 +25,8 @@ module.exports = {
         if (!context || !name){
              return logging.write("Delegating", "failed to register, no context or name provided.");
         }
+        context = context.toString();
+        name = name.toString();
         const pointer = module.exports.pointers.find(p => p.context === context);
         if (pointer){
             if (overwriteExisting){

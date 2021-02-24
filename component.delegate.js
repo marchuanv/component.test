@@ -1,10 +1,13 @@
 const utils = require("utils");
-const component = require("component");
-
-const config = component.require("component.config", false);
 const logging = require("component.logging");
-
 const fs = require("fs");
+require("component");
+
+require({ moduleName: "component.config", callingModule: module, cache: false }).then((config) => {
+    module.exports.register(config.name, `${config.port}${config.path}`)
+    
+});
+
 const callstackFile = `${__dirname}/callstack.json`;
 let stack = [];
 
@@ -26,7 +29,7 @@ module.exports = {
     pointers: [],
     register: ( context, name, callback, overwriteExisting = true ) => {
         if (!context || !name){
-             return logging.write("Delegating", "failed to register, no context or name provided.");
+                return logging.write("Delegating", "failed to register, no context or name provided.");
         }
         context = context.toString();
         name = name.toString();
@@ -67,10 +70,10 @@ module.exports = {
         }
 
         if (!context){
-             const error = "failed to invoke callback, no context provided.";
-             logging.write("Delegating", error);
-             contextLock.isLocked = false
-             return new Error(error);
+                const error = "failed to invoke callback, no context provided.";
+                logging.write("Delegating", error);
+                contextLock.isLocked = false
+                return new Error(error);
         }
         
         const pointer = module.exports.pointers.find(p => p.context === context);
@@ -96,7 +99,7 @@ module.exports = {
             contextLock.isLocked = false
             return new Error(error);
         }
-      
+        
         for(const callback of filteredCallbacks){
             try {
                 logging.write("Delegating", "invoking callback");

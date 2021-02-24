@@ -1,6 +1,9 @@
-const logging = require("logging");
 const utils = require("utils");
-logging.config.add("Delegating");
+const component = require("component");
+
+const config = component.require("component.config", false);
+const logging = require("component.logging");
+
 const fs = require("fs");
 const callstackFile = `${__dirname}/callstack.json`;
 let stack = [];

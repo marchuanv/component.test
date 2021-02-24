@@ -1,12 +1,7 @@
 const utils = require("utils");
+const comonent = require("./component.js");
 const logging = require("component.logging");
 const fs = require("fs");
-require("component");
-
-require({ moduleName: "component.config", callingModule: module, cache: false }).then((config) => {
-    module.exports.register(config.name, `${config.port}${config.path}`)
-    
-});
 
 const callstackFile = `${__dirname}/callstack.json`;
 let stack = [];

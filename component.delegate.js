@@ -1,5 +1,5 @@
 const utils = require("utils");
-const comonent = require("./component.js");
+const component = require("component");
 const logging = require("component.logging");
 const fs = require("fs");
 

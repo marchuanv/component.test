@@ -18,11 +18,11 @@ process.on('uncaughtException', () => terminate() );
 
 const locks = [];
 
-component.events.onRegister("component.logging", ({ componentLogging }) => {
+component.events.on({ moduleName: "component.logging", eventType: "register" },({ componentLogging }) => {
     
-    component.events.onRegister(({ module }) => {
-
-        const name = `${module.port}${module.path}`
+    component.events.on({ eventType: "register" }, ({ module }) => {
+        const name = `${module.port}${module.path}`;
+        const event = component.events.find({ moduleName: module.name, eventType: "module" });
         const context = module.name;
         const overwriteDelegate = module.overwriteDelegate;
         const pointer = module.exports.pointers.find(p => p.context === context);
@@ -34,7 +34,7 @@ component.events.onRegister("component.logging", ({ componentLogging }) => {
                     pointer.callbacks.splice(duplicateCallbackIndex,1);
                 }
             }
-            pointer.callbacks.push( { name, func: module.callback, retry: 1, timeout: 500, result: null });
+            pointer.callbacks.push( { name, func: event.callback, retry: 1, timeout: 500, result: null });
         } else {
             module.exports.pointers.push({ 
                 context, 
@@ -42,7 +42,6 @@ component.events.onRegister("component.logging", ({ componentLogging }) => {
             });
             componentLogging.write("Delegating", `Registered ${name} callback on ${context}`);
         }
-
     });
     
     module.exports = {

@@ -66,10 +66,10 @@ component.events.onRegister("component.logging", ({ componentLogging }) => {
             }
     
             if (!context){
-                    const error = "failed to invoke callback, no context provided.";
-                    componentLogging.write("Delegating", error);
-                    contextLock.isLocked = false
-                    return new Error(error);
+                const error = "failed to invoke callback, no context provided.";
+                componentLogging.write("Delegating", error);
+                contextLock.isLocked = false
+                return new Error(error);
             }
             
             const pointer = module.exports.pointers.find(p => p.context === context);

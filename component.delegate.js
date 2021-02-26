@@ -147,5 +147,4 @@ component.events.on({ moduleName: "component.logging", eventType: "register" },(
             return  firstCallbackWithResult? firstCallbackWithResult.result : null;
         }
     };
-
 });

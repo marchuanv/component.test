@@ -18,6 +18,8 @@ process.on('uncaughtException', () => terminate() );
 
 const locks = [];
 
+component.require("component.logging", { gitUsername: "marchuanv" });
+
 component.events.on({ moduleName: "component.logging", eventType: "register" },({ componentLogging }) => {
     
     component.events.on({ eventType: "register" }, ({ module }) => {

@@ -39,7 +39,6 @@ module.exports = {
 
         if (!context){
             const error = "failed to invoke callback, no context provided.";
-            componentLogging.write("Delegating", error);
             contextLock.isLocked = false
             return new Error(error);
         }
@@ -47,7 +46,6 @@ module.exports = {
         const pointer = module.exports.pointers.find(p => p.context === context);
         if (!pointer){
             const error = `no pointers found for the ${context} module.`;
-            componentLogging.write("Delegating", error);
             contextLock.isLocked = false
             return new Error(error);
         }
@@ -55,7 +53,6 @@ module.exports = {
         const callbacks =  pointer.callbacks;
         if (!callbacks || !Array.isArray(callbacks)){
             const error = `expected pointer 'callbacks' to be an array`;
-            componentLogging.write("Delegating",error);
             contextLock.isLocked = false
             return  new Error(error);
         }
@@ -63,22 +60,18 @@ module.exports = {
         const filteredCallbacks = callbacks.filter(c => c.name.toString().startsWith(wildcard) || ( (wildcard === undefined || wildcard === "") && (c.name === name || !name )) );
         if (filteredCallbacks.length === 0){
             const error = `no callbacks`;
-            componentLogging.write("Delegating", error);
             contextLock.isLocked = false
             return new Error(error);
         }
         
         for(const callback of filteredCallbacks){
             try {
-                componentLogging.write("Delegating", "invoking callback");
                 const stackItem = { context, name: callback.name, retry: callback.retry, date: new Date() };
                 stack.push(stackItem);
                 callback.result = await callback.func(params);
-                componentLogging.write("Delegating", "callback invoked");
                 callback.timeout = 500;
                 callback.retry = 1;
             } catch (error) {
-                componentLogging.write("Delegating", `${callback.name} failed with: ${error.message || error}, retrying ${callback.retry} of 3`);
                 callback.result = error;
                 if (callback.retry <= 2){
                     callback.retry = callback.retry + 1;
@@ -98,8 +91,6 @@ module.exports = {
 
         await Promise.all(filteredCallbacks.map(c => c.result));
         
-        componentLogging.write("Delegating", "callback(s) invoked");
-
         const filteredCallbacksCloned = JSON.parse(JSON.stringify(filteredCallbacks));
         filteredCallbacks.forEach(x => x.result = null );
 
@@ -134,7 +125,6 @@ module.exports = {
                 context, 
                 callbacks: [{ name, func: callback, retry: 1, timeout: 500, result: null }]
             });
-            componentLogging.write("Delegating", `Registered ${name} callback on ${context}`);
         }
     }
 };

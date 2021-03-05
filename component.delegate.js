@@ -119,8 +119,7 @@ module.exports = {
         const firstCallbackWithResult = filteredCallbacksCloned.find(cb => cb.result);
         return  firstCallbackWithResult? firstCallbackWithResult.result : null;
     },
-    register: async ({ context, name, callback, overwriteDelegate = true}) => {
-        const event = component.events.find({ moduleName: name, eventType: "module" });
+    register: async ({ context, name, overwriteDelegate = true }, callback) => {
         const pointer = module.exports.pointers.find(p => p.context === context);
         if (pointer){
             if (overwriteDelegate){
@@ -129,7 +128,7 @@ module.exports = {
                     pointer.callbacks.splice(duplicateCallbackIndex,1);
                 }
             }
-            pointer.callbacks.push( { name, func: event.callback, retry: 1, timeout: 500, result: null });
+            pointer.callbacks.push( { name, func: callback, retry: 1, timeout: 500, result: null });
         } else {
             module.exports.pointers.push({ 
                 context, 

@@ -1,6 +1,4 @@
-const component = require("component");
 const fs = require("fs");
-
 const callstackFile = `${__dirname}/callstack.json`;
 let stack = [];
 

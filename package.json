@@ -24,6 +24,6 @@
   "homepage": "https://github.com/marchuanv/component.test#readme",
   "dependencies": {},
   "parentDependencies": {
-    "component.test": "marchuanv/component.test"
+    "component.request.handler": "marchuanv/component.request.handler"
   }
 }

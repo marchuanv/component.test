@@ -1,8 +1,8 @@
 {
-  "name": "component.delegate",
+  "name": "component.test",
   "version": "1.0.0",
-  "description": "delegating function calls with retry policies",
-  "main": "component.delegate.js",
+  "description": "testing the basics of a component",
+  "main": "component.test.js",
   "hostname": "localhost",
   "port": 3000,
   "engines": {
@@ -14,15 +14,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/marchuanv/component.delegate.git"
+    "url": "git+https://github.com/marchuanv/component.test.git"
   },
   "author": "Marchuan Van Der Merwe",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/marchuanv/component.delegate/issues"
+    "url": "https://github.com/marchuanv/component.test/issues"
   },
-  "homepage": "https://github.com/marchuanv/component.delegate#readme",
-  "dependencies": {
-    "utils": "marchuanv/utils"
-  }
+  "homepage": "https://github.com/marchuanv/component.test#readme",
+  "dependencies": {}
 }

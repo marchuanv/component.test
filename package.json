@@ -22,5 +22,8 @@
     "url": "https://github.com/marchuanv/component.test/issues"
   },
   "homepage": "https://github.com/marchuanv/component.test#readme",
-  "dependencies": {}
+  "dependencies": {},
+  "parentDependencies": {
+    "component.test": "marchuanv/component.test"
+  }
 }

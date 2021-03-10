@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/marchuanv/component.delegate#readme",
   "dependencies": {
-    "utils": "marchuanv/utils"
+    "utils": "marchuanv/utils",
+    "component": "marchuanv/component"
   }
 }

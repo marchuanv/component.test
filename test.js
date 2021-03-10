@@ -1,4 +1,4 @@
-const componentDelegate = require("./component.delegate.js");
+
 
 // const callingModule1 = "something";
 // const callingModule2 = "something2";
@@ -21,6 +21,17 @@ const componentDelegate = require("./component.delegate.js");
 
 
 (async() => {
+
+    require("./component.delegate.js");
+    const component = require("component");
+
+    const del1 = new component.Delegate("Bob");
+    const del2 = new component.Delegate("Bob");
+
+
+    
+    
+
     // const prom = new Promise(async (resolve) => {
     //     const parameters = {};
     //     const results = await componentDelegate.call( { context: callingModule1 }, parameters);

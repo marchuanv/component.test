@@ -1,4 +1,5 @@
 const fs = require("fs");
+const component = require("component");
 const callstackFile = `${__dirname}/callstack.json`;
 let stack = [];
 
@@ -15,10 +16,14 @@ process.on('SIGUSR2', () => saveCallstack() );
 process.on('uncaughtException', () => saveCallstack() );
 
 const locks = [];
-module.exports = {
-    pointers: [],
-    call: async ( { context, name, wildcard }, params) => {
-        
+const pointers = [];
+    
+component.Delegate = function(context) {
+    if (!context){
+        const error = "no context provided.";
+        return new Error(error);
+    }
+    this.call = async ( { name, wildcard }, params) => {
         const contextLockName = context || "global";
         let contextLock = locks.find(x => x.context === contextLockName);
         if (!contextLock) {
@@ -29,19 +34,13 @@ module.exports = {
         } else {
             return new Promise((resolve)=> {
                 setTimeout(async () => {
-                    const results = await module.exports.call( { context, name, wildcard }, params);
+                    const results = await component.delegate.call( { name, wildcard }, params);
                     resolve(results);
                 }, 1000);
             });
         }
-
-        if (!context){
-            const error = "failed to invoke callback, no context provided.";
-            contextLock.isLocked = false
-            return new Error(error);
-        }
         
-        const pointer = module.exports.pointers.find(p => p.context === context);
+        const pointer = pointers.find(p => p.context === context);
         if (!pointer){
             const error = `no pointers found for the ${context} module.`;
             contextLock.isLocked = false
@@ -74,7 +73,7 @@ module.exports = {
                 if (callback.retry <= 2){
                     callback.retry = callback.retry + 1;
                     setTimeout(async () => {
-                        await module.exports.call( { context, name: callback.name, wildcard }, params);
+                        await component.delegate.call( { context, name: callback.name, wildcard }, params);
                     }, callback.timeout);
                 }
                 callback.timeout = callback.timeout * 2;
@@ -107,9 +106,9 @@ module.exports = {
 
         const firstCallbackWithResult = filteredCallbacksCloned.find(cb => cb.result);
         return  firstCallbackWithResult? firstCallbackWithResult.result : null;
-    },
-    register: async ({ context, name, overwriteDelegate = true }, callback) => {
-        const pointer = module.exports.pointers.find(p => p.context === context);
+    };
+    this.register = async ({ name, overwriteDelegate = true }, callback) => {
+        const pointer = pointers.find(p => p.context === context);
         if (pointer){
             if (overwriteDelegate){
                 const duplicateCallbackIndex = pointer.callbacks.findIndex(x => x.name === name);
@@ -119,10 +118,11 @@ module.exports = {
             }
             pointer.callbacks.push( { name, func: callback, retry: 1, timeout: 500, result: null });
         } else {
-            module.exports.pointers.push({ 
+            pointers.push({ 
                 context, 
                 callbacks: [{ name, func: callback, retry: 1, timeout: 500, result: null }]
             });
         }
-    }
+    };
 };
+module.exports = {};

@@ -18,7 +18,7 @@ process.on('uncaughtException', () => saveCallstack() );
 const locks = [];
 const pointers = [];
     
-component.Delegate = function(context) {
+module.exports = function(context) {
     if (!context){
         const error = "no context provided.";
         return new Error(error);
@@ -125,4 +125,3 @@ component.Delegate = function(context) {
         }
     };
 };
-module.exports = {};

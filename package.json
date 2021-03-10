@@ -2,7 +2,7 @@
   "name": "component.test",
   "version": "1.0.0",
   "description": "testing the basics of a component",
-  "main": "component.test.js",
+  "main": "test.js",
   "hostname": "localhost",
   "port": 3000,
   "engines": {

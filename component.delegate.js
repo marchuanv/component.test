@@ -1,5 +1,4 @@
 const fs = require("fs");
-const component = require("component");
 const callstackFile = `${__dirname}/callstack.json`;
 let stack = [];
 
@@ -77,7 +76,7 @@ module.exports = function({ context, callbackContext }) {
                 if (callback.retry <= 2){
                     callback.retry = callback.retry + 1;
                     setTimeout(async () => {
-                        await component.delegate.call( { context: callbackContext, name: callback.name, wildcard }, params);
+                        await this.call( { context: callbackContext, name: callback.name, wildcard }, params);
                     }, callback.timeout);
                 }
                 callback.timeout = callback.timeout * 2;

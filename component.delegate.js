@@ -18,13 +18,17 @@ process.on('uncaughtException', () => saveCallstack() );
 const locks = [];
 const pointers = [];
     
-module.exports = function(context) {
+module.exports = function({ context, callbackContext }) {
     if (!context){
         const error = "no context provided.";
         return new Error(error);
     }
+    if (!callbackContext){
+        const error = "no callback context provided.";
+        return new Error(error);
+    }
     this.call = async ( { name, wildcard }, params) => {
-        const contextLockName = context || "global";
+        const contextLockName = callbackContext || "global";
         let contextLock = locks.find(x => x.context === contextLockName);
         if (!contextLock) {
             contextLock = { isLocked: true, context: contextLockName };
@@ -34,15 +38,15 @@ module.exports = function(context) {
         } else {
             return new Promise((resolve)=> {
                 setTimeout(async () => {
-                    const results = await component.delegate.call( { name, wildcard }, params);
+                    const results = await this.call( { name, wildcard }, params);
                     resolve(results);
                 }, 1000);
             });
         }
         
-        const pointer = pointers.find(p => p.context === context);
+        const pointer = pointers.find(p => p.context === callbackContext);
         if (!pointer){
-            const error = `no pointers found for the ${context} module.`;
+            const error = `no pointers found for the ${callbackContext} module.`;
             contextLock.isLocked = false
             return new Error(error);
         }
@@ -51,7 +55,7 @@ module.exports = function(context) {
         if (!callbacks || !Array.isArray(callbacks)){
             const error = `expected pointer 'callbacks' to be an array`;
             contextLock.isLocked = false
-            return  new Error(error);
+            return new Error(error);
         }
 
         const filteredCallbacks = callbacks.filter(c => c.name.toString().startsWith(wildcard) || ( (wildcard === undefined || wildcard === "") && (c.name === name || !name )) );
@@ -63,7 +67,7 @@ module.exports = function(context) {
         
         for(const callback of filteredCallbacks){
             try {
-                const stackItem = { context, name: callback.name, retry: callback.retry, date: new Date() };
+                const stackItem = { context: callbackContext, name: callback.name, retry: callback.retry, date: new Date() };
                 stack.push(stackItem);
                 callback.result = await callback.func(params);
                 callback.timeout = 500;
@@ -73,7 +77,7 @@ module.exports = function(context) {
                 if (callback.retry <= 2){
                     callback.retry = callback.retry + 1;
                     setTimeout(async () => {
-                        await component.delegate.call( { context, name: callback.name, wildcard }, params);
+                        await component.delegate.call( { context: callbackContext, name: callback.name, wildcard }, params);
                     }, callback.timeout);
                 }
                 callback.timeout = callback.timeout * 2;
@@ -99,7 +103,7 @@ module.exports = function(context) {
 
         if (filteredCallbacksCloned.filter(cb => cb.result).length > 1){
             contextLock.isLocked = false
-            return new Error(`expected at most one of all the functions registered for "${context}" to return results`);
+            return new Error(`expected at most one of all the functions registered for "${callbackContext}" to return results`);
         }
 
         contextLock.isLocked = false

@@ -22,7 +22,7 @@
     "url": "https://github.com/marchuanv/component.test/issues"
   },
   "homepage": "https://github.com/marchuanv/component.test#readme",
-  "dependencies": {  
-    "component.request.handler": "marchuanv/component.request.handler"
+  "dependencies": {
+    "component": "marchuanv/component"
   }
 }

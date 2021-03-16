@@ -1,4 +1,5 @@
 (async() => {
-    await require("./component.test.config.js");
+    await require("./bootstrap.js");
     require("./component.request.handler.test.js");
+    require("./component.request.handler.route.test.js");
 })();

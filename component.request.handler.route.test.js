@@ -1,6 +1,6 @@
 const component = require("component");
 
-let {package} = require("component.request.handler/component.test");
+let {package} = require("component.request.handler.route/component.test");
 package.parentName = "component.test";
 
 component.register({componentModule: module }).then( async ( { test } ) => {

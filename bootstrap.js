@@ -19,14 +19,14 @@ module.exports = (() => {
                     packageJson.lock = true;
                     packageJson.name = `${moduleName}.proxy`;
                     let packageJson2 = require(`./node_modules/${moduleName}/package.json`);
-                    let originalParent = packageJson2.parentName;
-                    packageJson2.parentName = packageJson.name;
+                    let originalParent = packageJson2.component.parentName;
+                    packageJson2.component.parentName = packageJson.name;
                     await resolve({ run: async (callback) => {
                         await callback({ 
                             component,
                             request
                         });
-                        packageJson2.parentName = originalParent;
+                        packageJson2.component.parentName = originalParent;
                         packageJson.lock = false;
                     }});
                 },1000);

@@ -3,8 +3,6 @@
   "version": "1.0.0",
   "description": "testing the basics of a component",
   "main": "test.js",
-  "hostname": "localhost",
-  "port": 3000,
   "engines": {
     "node": "14.12.0",
     "npm": "6.14.8"
@@ -24,5 +22,9 @@
   "homepage": "https://github.com/marchuanv/component.test#readme",
   "dependencies": {
     "component": "marchuanv/component"
+  },
+  "component": {
+    "host": "localhost",
+    "port": 3000
   }
 }

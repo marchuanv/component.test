@@ -12,10 +12,31 @@ require("./bootstrap.js").then( async ({ proxy }) => {
         let results = await request.send({ 
             path: "/test2",
             method: "GET",
+            headers: {},
+            data: ""
+        });
+        if (results.statusCode !== 400) {
+            throw "User Test Failed.";
+        }
+        results = await request.send({
+            path: "/test2",
+            method: "GET",
             headers: {
                 username: "joe",
                 fromport: 4000,
                 fromhost: "localhost"
+            }, 
+            data: ""
+        });
+        if (results.statusCode !== 200 || results.statusMessage !== "User Test Successful"){
+            throw "User Test Failed.";
+        }
+
+        results = await request.send({
+            path: "/test2",
+            method: "GET",
+            headers: {
+                sessionId: results.headers.sessionid
             }, 
             data: ""
         });

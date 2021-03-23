@@ -22,10 +22,7 @@ module.exports = (() => {
                     let originalParent = packageJson2.component.parentName;
                     packageJson2.component.parentName = packageJson.name;
                     await resolve({ run: async (callback) => {
-                        await callback({ 
-                            component,
-                            request
-                        });
+                        await callback({ component, request });
                         packageJson2.component.parentName = originalParent;
                         packageJson.lock = false;
                     }});

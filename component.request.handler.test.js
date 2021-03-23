@@ -10,13 +10,10 @@ require("./bootstrap.js").then( async ({ proxy }) => {
             };
         });
         let results = await request.send({ 
-            host: "localhost",
-            port: 3000,
             path: "/test1",
             method: "GET",
             headers: {}, 
-            data: "",
-            retryCount: 1
+            data: ""
         });
         if (results.statusCode !== 200 || results.statusMessage !== "Request Test Successful"){
             throw "Request Test Failed.";

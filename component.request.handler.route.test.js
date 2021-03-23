@@ -10,13 +10,10 @@ require("./bootstrap.js").then( async ({ proxy }) => {
             };
         });
         let results = await request.send({ 
-            host: "localhost",
-            port: 3000,
             path: "/test2",
             method: "GET",
             headers: {}, 
-            data: "",
-            retryCount: 1
+            data: ""
         });
         if (results.statusCode !== 200 || results.statusMessage !== "Routing Test Successful"){
             throw "Routing Test Failed.";

@@ -4,6 +4,7 @@ module.exports = (() => {
         await component.load({ moduleName:"component.request.handler" });
         await component.load({ moduleName:"component.request.handler.route" });
         await component.load({ moduleName:"component.request.handler.deferred" });
+        await component.load({ moduleName:"component.request.handler.user" });
         const { request } = await component.load({ moduleName:"component.request" });
         let packageJson = require("./package.json");
         if (packageJson.lock === undefined){

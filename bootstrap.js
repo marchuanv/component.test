@@ -9,7 +9,6 @@ component.on({ eventName: "config", moduleName:"component.request.handler.route"
     ];
 });
 
-
 module.exports = (() => {
     return new Promise(async (resolve) => {
         
@@ -30,11 +29,12 @@ module.exports = (() => {
                     module.path = module.path.replace(packageJson.name,`${moduleName}.proxy`);
                     packageJson.name = `${moduleName}.proxy`;
 
-                    let originalParent;
-                    component.on({ eventName: "config", moduleName },(config) => {
-                        originalParent = config.parent;
-                        config.parent = [];
-                        config.parent.push(packageJson.name);
+                    let config;
+                    component.on({ eventName: "config", moduleName },(_config) => {
+                        _config.originalParent = _config.parent;
+                        _config.parent = [];
+                        _config.parent.push(packageJson.name);
+                        config = _config;
                     });
 
                     await resolve({ run: async (callback) => {
@@ -44,6 +44,7 @@ module.exports = (() => {
                         results.request = await component.load( { moduleName: "component.request" });
                         await component.load({ moduleName });
                         await callback(results);
+                        config.parent = config.originalParent;
                         packageJson.lock = false;
                     }});
 

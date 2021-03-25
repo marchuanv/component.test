@@ -1,6 +1,17 @@
 const component = require("component");
 let lockTest = false;
 
+//configure test routes
+component.register("component.request.handler.route").then(({ requestHandlerRoute }) => {
+    requestHandlerRoute.routes = [
+        { path: "/requesthandlertest" },
+        { path: "/requesthandlerroutetest" },
+        { path: "/requesthandlerdeferredtest" },
+        { path: "/requesthandlerusertest" },
+        { path: "/requesthandlerunsecuretest" }
+    ];
+});
+
 const bootstrap = () => {
     return new Promise((resolve) => {
         const id = setInterval(async() => {
@@ -20,7 +31,6 @@ const bootstrap = () => {
 
                 const registeredResults = {};
                 const registeredModuleUnderTest = await component.register(moduleName);
-                const registeredModulRouteseUnderTest = await component.register("component.request.handler.route");
                 const registeredModuleUnderTestProxy = await component.register(module);
 
                 Object.assign(registeredResults, registeredRequest);
@@ -33,15 +43,6 @@ const bootstrap = () => {
                 let friendlyName;
                 for(const property in registeredModuleUnderTest){
                     friendlyName = property;
-                };
-                for(const property in registeredModulRouteseUnderTest){
-                    registeredModulRouteseUnderTest[property].routes = [
-                        { path: "/requesthandlertest" },
-                        { path: "/requesthandlerroutetest" },
-                        { path: "/requesthandlerdeferredtest" },
-                        { path: "/requesthandlerusertest" },
-                        { path: "/requesthandlerunsecuretest" }
-                    ];
                 };
 
                 originalParent = registeredModuleUnderTest[friendlyName].parent;

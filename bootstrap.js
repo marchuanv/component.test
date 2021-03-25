@@ -1,55 +1,60 @@
 const component = require("component");
-component.on({ eventName: "config", moduleName:"component.request.handler.route" },(config) => {
-    config.routes = [
-        { path: "/requesthandlertest" },
-        { path: "/requesthandlerroutetest" },
-        { path: "/requesthandlerdeferredtest" },
-        { path: "/requesthandlerusertest" },
-        { path: "/requesthandlerunsecuretest" }
-    ];
-});
+let lockTest = false;
 
-module.exports = (() => {
-    return new Promise(async (resolve) => {
-        
-        let packageJson = require("./package.json");
-        if (packageJson.lock === undefined){
-            packageJson.lock = false;
-        }
+const bootstrap = () => {
+    return new Promise((resolve) => {
+        const id = setInterval(async() => {
+            if (lockTest){
+                return;
+            }
+            clearInterval(id);
+            lockTest = true;
+            await resolve(async ({ moduleName }) => {
+            
+                const registeredRequest = await component.register("component.request");
+                const request = await component.load( { moduleName: "component.request" });
 
-        await resolve({ proxy: ({ moduleName }) => {
-            return new Promise((resolve) => {
-                const id = setInterval(async () => {
-                    if (packageJson.lock){
-                        return;
-                    }
-                    clearInterval(id);
+                let packageJson = require("./package.json");
+                module.path = module.path.replace(packageJson.name,`${moduleName}.proxy`);
+                packageJson.name = `${moduleName}.proxy`;
 
-                    packageJson.lock = true;
-                    module.path = module.path.replace(packageJson.name,`${moduleName}.proxy`);
-                    packageJson.name = `${moduleName}.proxy`;
+                const registeredResults = {};
+                const registeredModuleUnderTest = await component.register(moduleName);
+                const registeredModulRouteseUnderTest = await component.register("component.request.handler.route");
+                const registeredModuleUnderTestProxy = await component.register(module);
 
-                    let config;
-                    component.on({ eventName: "config", moduleName },(_config) => {
-                        _config.originalParent = _config.parent;
-                        _config.parent = [];
-                        _config.parent.push(packageJson.name);
-                        config = _config;
-                    });
+                Object.assign(registeredResults, registeredRequest);
+                Object.assign(registeredResults, registeredModuleUnderTest);
+                Object.assign(registeredResults, registeredModuleUnderTestProxy);
+                
+                await component.load({ moduleName });
 
-                    await resolve({ run: async (callback) => {
-                        await component.register("component.request");
-                        await component.register(moduleName);
-                        const results = await component.register(module);
-                        results.request = await component.load( { moduleName: "component.request" });
-                        await component.load({ moduleName });
-                        await callback(results);
-                        config.parent = config.originalParent;
-                        packageJson.lock = false;
-                    }});
+                let originalParent;
+                let friendlyName;
+                for(const property in registeredModuleUnderTest){
+                    friendlyName = property;
+                };
+                for(const property in registeredModulRouteseUnderTest){
+                    registeredModulRouteseUnderTest[property].routes = [
+                        { path: "/requesthandlertest" },
+                        { path: "/requesthandlerroutetest" },
+                        { path: "/requesthandlerdeferredtest" },
+                        { path: "/requesthandlerusertest" },
+                        { path: "/requesthandlerunsecuretest" }
+                    ];
+                };
 
-                },1000);
+                originalParent = registeredModuleUnderTest[friendlyName].parent;
+                registeredModuleUnderTest[friendlyName].parent = [];
+                registeredModuleUnderTest[friendlyName].parent.push(packageJson.name);
+                
+                return { request, component: registeredResults[`${friendlyName}Proxy`], complete: () => {
+                    //Reset Config
+                    registeredModuleUnderTest[friendlyName].parent = originalParent;
+                    lockTest = false;
+                }};
             });
-        }});
+        },1000);
     });
-})();
+};
+module.exports = { bootstrap };

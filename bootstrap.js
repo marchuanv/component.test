@@ -4,11 +4,11 @@ let lockTest = false;
 //configure test routes
 component.register("component.request.handler.route").then(({ requestHandlerRoute }) => {
     requestHandlerRoute.routes = [
-        { path: "/requesthandlertest" },
-        { path: "/requesthandlerroutetest" },
-        { path: "/requesthandlerdeferredtest" },
-        { path: "/requesthandlerusertest" },
-        { path: "/requesthandlerunsecuretest" }
+        { path: "/requesthandlertest", secure: false },
+        { path: "/requesthandlerroutetest", secure: false },
+        { path: "/requesthandlerdeferredtest", secure: false },
+        { path: "/requesthandlerusertest", secure: false },
+        { path: "/requesthandlerunsecuretest", secure: false }
     ];
 });
 

@@ -1,5 +1,4 @@
 const component = require("component");
-let lockTest = false;
 
 //configure test routes
 component.register("component.request.handler.route").then(({ requestHandlerRoute }) => {
@@ -8,9 +7,12 @@ component.register("component.request.handler.route").then(({ requestHandlerRout
         { path: "/requesthandlerroutetest", secure: false },
         { path: "/requesthandlerdeferredtest", secure: false },
         { path: "/requesthandlerusertest", secure: false },
-        { path: "/requesthandlerunsecuretest", secure: false }
+        { path: "/requesthandlerunsecuretest", secure: false },
+        { path: "/requesthandlersecuretest", secure: true },
     ];
 });
+
+let lockTest = false;
 
 const bootstrap = () => {
     return new Promise((resolve) => {
@@ -18,12 +20,12 @@ const bootstrap = () => {
             if (lockTest){
                 return;
             }
-            clearInterval(id);
             lockTest = true;
+            clearInterval(id);
             await resolve(async ({ moduleName }) => {
             
                 const registeredRequest = await component.register("component.request");
-                const request = await component.load( { moduleName: "component.request" });
+                const request = await component.load({ moduleName: "component.request" });
 
                 let packageJson = require("./package.json");
                 module.path = module.path.replace(packageJson.name,`${moduleName}.proxy`);
@@ -38,20 +40,20 @@ const bootstrap = () => {
                 Object.assign(registeredResults, registeredModuleUnderTestProxy);
                 
                 await component.load({ moduleName });
-
-                let originalParent;
+                
+                let originalSubscribers;
                 let friendlyName;
                 for(const property in registeredModuleUnderTest){
                     friendlyName = property;
                 };
 
-                originalParent = registeredModuleUnderTest[friendlyName].parent;
-                registeredModuleUnderTest[friendlyName].parent = [];
-                registeredModuleUnderTest[friendlyName].parent.push(packageJson.name);
+                originalSubscribers = registeredModuleUnderTest[friendlyName].subscribers;
+                registeredModuleUnderTest[friendlyName].subscribers = [];
+                registeredModuleUnderTest[friendlyName].subscribers.push({ moduleName: packageJson.name });
                 
                 return { request, component: registeredResults[`${friendlyName}Proxy`], complete: () => {
                     //Reset Config
-                    registeredModuleUnderTest[friendlyName].parent = originalParent;
+                    registeredModuleUnderTest[friendlyName].parent = originalSubscribers;
                     lockTest = false;
                 }};
             });

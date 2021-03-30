@@ -1,7 +1,7 @@
 const { bootstrap } = require("./bootstrap.js");
 bootstrap("component.request.handler.user").then( async ({ request, component, complete }) => {
     const newRequest = { port: 3000, path: "/requesthandlerusertest", method: "GET", headers: {},  data: "" };
-    component.subscribe({ name: `${newRequest.port}${newRequest.path}` }, () => {
+    component.subscribe({ channel: component.channel }, () => {
         return {
             statusCode: 200,
             statusMessage: "User Test Successful",

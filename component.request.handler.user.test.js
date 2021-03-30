@@ -1,6 +1,5 @@
 const { bootstrap } = require("./bootstrap.js");
-bootstrap().then( async (load) => {
-    let { request, component, complete } = await load({ moduleName: "component.request.handler.user" });
+bootstrap("component.request.handler.user").then( async ({ request, component, complete }) => {
     const newRequest = { port: 3000, path: "/requesthandlerusertest", method: "GET", headers: {},  data: "" };
     component.subscribe({ name: `${newRequest.port}${newRequest.path}` }, () => {
         return {
@@ -31,7 +30,6 @@ bootstrap().then( async (load) => {
     if (results.statusCode !== 200 || results.statusMessage !== "User Test Successful"){
         console.log(`User Test Failed: ${results.data}`);
     }
-
     complete();
 }).catch((err)=>{
     console.log(err);

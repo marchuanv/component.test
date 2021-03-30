@@ -1,6 +1,5 @@
 const { bootstrap } = require("./bootstrap.js");
-bootstrap().then( async (load) => {
-    let { request, component, complete } = await load({ moduleName: "component.request.handler" });
+bootstrap("component.request.handler").then( async ({ request, component, complete }) => {
     const newRequest = { port: 3000, path: "/requesthandlertest", method: "GET", headers: {},  data: "" };
     component.subscribe({ channel: component.channel }, () => {
         return {

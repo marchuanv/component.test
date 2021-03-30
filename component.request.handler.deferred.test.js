@@ -2,7 +2,7 @@ const { bootstrap } = require("./bootstrap.js");
 bootstrap().then( async (load) => {
     let { request, component, complete } = await load({ moduleName: "component.request.handler.deferred" });
     const newRequest = { port: 3000, path: "/requesthandlerdeferredtest", method: "GET", headers: {},  data: "" };
-    component.subscribe({ name: `${newRequest.port}${newRequest.path}` }, () => {
+    component.subscribe({ channel: component.channel }, () => {
         return {
             statusCode: 200,
             statusMessage: "Deffered Test Successful",

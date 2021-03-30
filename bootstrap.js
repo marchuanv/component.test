@@ -24,38 +24,35 @@ const bootstrap = () => {
             clearInterval(id);
             await resolve(async ({ moduleName }) => {
             
-                const registeredRequest = await component.register("component.request");
-                const request = await component.load({ moduleName: "component.request" });
-
+                await component.register("component.request");
                 let packageJson = require("./package.json");
                 module.path = module.path.replace(packageJson.name,`${moduleName}.proxy`);
                 packageJson.name = `${moduleName}.proxy`;
 
-                const registeredResults = {};
-                const registeredModuleUnderTest = await component.register(moduleName);
-                const registeredModuleUnderTestProxy = await component.register(module);
-
-                Object.assign(registeredResults, registeredRequest);
-                Object.assign(registeredResults, registeredModuleUnderTest);
-                Object.assign(registeredResults, registeredModuleUnderTestProxy);
-                
-                await component.load({ moduleName });
-                
                 let originalSubscribers;
-                let friendlyName;
-                for(const property in registeredModuleUnderTest){
-                    friendlyName = property;
-                };
+                const registeredModuleUnderTest = Object.values(await component.register(moduleName))[0];
+                originalSubscribers = registeredModuleUnderTest.subscribers;
+                registeredModuleUnderTest.subscribers = [];
+                registeredModuleUnderTest.subscribers.push({ moduleName: packageJson.name });
 
-                originalSubscribers = registeredModuleUnderTest[friendlyName].subscribers;
-                registeredModuleUnderTest[friendlyName].subscribers = [];
-                registeredModuleUnderTest[friendlyName].subscribers.push({ moduleName: packageJson.name });
+                const registeredModuleUnderTestProxy = Object.values(await component.register(module))[0];
+                registeredModuleUnderTestProxy.publishers.push({ moduleName: registeredModuleUnderTest.name  });
                 
-                return { request, component: registeredResults[`${friendlyName}Proxy`], complete: () => {
-                    //Reset Config
-                    registeredModuleUnderTest[friendlyName].parent = originalSubscribers;
-                    lockTest = false;
-                }};
+                for(const { moduleName } of registeredModuleUnderTest.publishers){
+                    await component.load({ moduleName });
+                };
+                await component.load({ moduleName });
+                const request = await component.load({ moduleName: "component.request" });
+                
+                return {
+                    request,
+                    component: registeredModuleUnderTestProxy,
+                    complete: () => {
+                        //Reset Config
+                        registeredModuleUnderTest.subscribers = originalSubscribers;
+                        lockTest = false;
+                    }
+                };
             });
         },1000);
     });

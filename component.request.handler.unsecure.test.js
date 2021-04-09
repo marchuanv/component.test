@@ -1,8 +1,7 @@
 const { bootstrap } = require("./bootstrap.js");
-bootstrap().then( async (load) => {
-    let { request, component, complete } = await load({ moduleName: "component.request.handler.unsecure" });
+bootstrap("component.request.handler.unsecure").then( async ({ request, component, complete }) => {
     const newRequest = { port: 3000, path: "/requesthandlerunsecuretest", method: "GET", headers: {},  data: "" };
-    component.subscribe({ name: `${newRequest.port}${newRequest.path}` }, () => {
+    component.subscribe(() => {
         return {
             statusCode: 200,
             statusMessage: "Unsecure Test Successful",

@@ -9,7 +9,7 @@ bootstrap("component.request.handler.route").then( async ({ request, component, 
         { path: "/requesthandlersecuretest", secure: true },
     ];
     const newRequest = { port: 3000, path: "/requesthandlerroutetest", method: "GET", headers: {},  data: "" };
-    component.subscribe({ channel: component.config.channel }, () => {
+    component.subscribe( () => {
         return {
             statusCode: 200,
             statusMessage: "Routing Test Successful",

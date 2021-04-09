@@ -28,8 +28,8 @@ const bootstrap = (moduleName) => {
             }
             let componentUnderTestProxy = await component.load(module);
             componentUnderTestProxy = componentUnderTestProxy[componentUnderTestProxy.name];
-            componentUnderTestProxy.config.publishers = [];
-            componentUnderTestProxy.config.publishers.push({ moduleName: componentUnderTest.name });
+            componentUnderTestProxy.config.dependencies = [];
+            componentUnderTestProxy.config.dependencies.push({ moduleName: componentUnderTest.name });
             await resolve({
                 request: request.exports,
                 component: componentUnderTestProxy,

@@ -26,6 +26,6 @@
   "component": {
     "channel": 3000,
     "subscribers": [],
-    "publishers": []
+    "dependencies": []
   }
 }

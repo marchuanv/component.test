@@ -12,7 +12,7 @@ bootstrap("component.request.handler").then( async ({ request, component, comple
     if (results.statusCode !== 200 || results.statusMessage !== "Request Test Successful"){
         console.log(`Request Test Failed: ${results.data}`);
     } else {
-        console.log(`Request Test Passed: ${results.data}`);
+        console.log(`Request Test Passed`);
     }
     complete();
 }).catch((err)=>{

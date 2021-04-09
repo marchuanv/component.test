@@ -1,7 +1,7 @@
 const { bootstrap } = require("./bootstrap.js");
 bootstrap("component.request.handler").then( async ({ request, component, complete }) => {
     const newRequest = { port: 3000, path: "/requesthandlertest", method: "GET", headers: {},  data: "" };
-    component.subscribe({ channel: component.channel }, () => {
+    component.subscribe({ channel: component.config.channel }, () => {
         return {
             statusCode: 200,
             statusMessage: "Request Test Successful",
@@ -11,6 +11,8 @@ bootstrap("component.request.handler").then( async ({ request, component, comple
     let results = await request.send(newRequest);
     if (results.statusCode !== 200 || results.statusMessage !== "Request Test Successful"){
         console.log(`Request Test Failed: ${results.data}`);
+    } else {
+        console.log(`Request Test Passed: ${results.data}`);
     }
     complete();
 }).catch((err)=>{

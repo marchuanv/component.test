@@ -15,28 +15,19 @@ const bootstrap = (moduleName) => {
             packageJson.name = `${moduleName}.proxy`;
             let componentUnderTest = await component.load(moduleName);
             componentUnderTest = componentUnderTest[componentUnderTest.name];
-
-            if (componentUnderTest.name.indexOf("Route") > -1 ) {
-                componentUnderTest.config.routes = [
-                    { path: "/requesthandlertest", secure: false },
-                    { path: "/requesthandlerroutetest", secure: false },
-                    { path: "/requesthandlerdeferredtest", secure: false },
-                    { path: "/requesthandlerusertest", secure: false },
-                    { path: "/requesthandlerunsecuretest", secure: false },
-                    { path: "/requesthandlersecuretest", secure: true },
-                ];
-            }
             let componentUnderTestProxy = await component.load(module);
             componentUnderTestProxy = componentUnderTestProxy[componentUnderTestProxy.name];
             componentUnderTestProxy.config.dependencies = [];
             componentUnderTestProxy.config.dependencies.push({ moduleName: componentUnderTest.name });
-            await resolve({
+            const results = {
                 request: request.exports,
                 component: componentUnderTestProxy,
                 complete: () => {
                     lockTest = false;
                 }
-            });
+            };
+            results[componentUnderTest.config.friendlyName] = componentUnderTest;
+            await resolve(results);
         },1000);
     });
 };

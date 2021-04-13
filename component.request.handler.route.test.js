@@ -1,13 +1,17 @@
 const { bootstrap } = require("./bootstrap.js");
-bootstrap("component.request.handler.route").then( async ({ request, component, requestHandlerRoute, complete }) => {
-    requestHandlerRoute.config.routes = [
-        { path: "/requesthandlertest", secure: false },
-        { path: "/requesthandlerroutetest", secure: false },
-        { path: "/requesthandlerdeferredtest", secure: false },
-        { path: "/requesthandlerusertest", secure: false },
-        { path: "/requesthandlerunsecuretest", secure: false },
-        { path: "/requesthandlersecuretest", secure: true },
-    ];
+bootstrap("component.request.handler.route").then( async ({ request, component, complete }) => {
+    const registerRouteRequest = { 
+        port: 3000, path: "/routes/register", method: "GET", 
+        headers: { username: "joe", fromport: 4000, fromhost: "localhost" },  
+        data: '{ "path": "/requesthandlerroutetest" }'
+    };
+    let results = await request.send(registerRouteRequest);
+    if (results.statusCode !== 200 || results.statusMessage !== "/requesthandlerroutetest registered"){
+        console.log(`Registering Routing Test Failed: ${results.data}`);
+    } else {
+        console.log(`Registering Routing Test Passed`);
+    }
+
     const newRequest = { port: 3000, path: "/requesthandlerroutetest", method: "GET", headers: {},  data: "" };
     component.subscribe( () => {
         return {
@@ -21,7 +25,7 @@ bootstrap("component.request.handler.route").then( async ({ request, component, 
         fromport: 4000,
         fromhost: "localhost"
     };
-    let results = await request.send(newRequest);
+    results = await request.send(newRequest);
     if (results.statusCode !== 200 || results.statusMessage !== "Routing Test Successful"){
         console.log(`Routing Test Failed: ${results.data}`);
     } else {

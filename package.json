@@ -21,7 +21,8 @@
   },
   "homepage": "https://github.com/marchuanv/component.test#readme",
   "dependencies": {
-    "component": "marchuanv/component"
+    "component": "marchuanv/component",
+    "utils": "marchuanv/utils"
   },
   "component": {
     "channel": 3000,

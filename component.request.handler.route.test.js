@@ -1,9 +1,10 @@
 const { bootstrap } = require("./bootstrap.js");
+const utils = require("utils");
 bootstrap("component.request.handler.route").then( async ({ request, component, complete }) => {
     const registerRouteRequest = { 
         port: 3000, path: "/routes/register", method: "GET", 
         headers: { username: "joe", fromport: 4000, fromhost: "localhost" },  
-        data: '{ "path": "/requesthandlerroutetest" }'
+        data: utils.getJSONString({ path: "/requesthandlerroutetest" })
     };
     let results = await request.send(registerRouteRequest);
     if (results.statusCode !== 200 || results.statusMessage !== "/requesthandlerroutetest registered"){

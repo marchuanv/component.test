@@ -39,7 +39,11 @@ module.exports = {
                 return {
                     success: true,
                     reasons: [],
-                    message: "Success"
+                    message: {
+                        headers: {},
+                        statusCode: 200,
+                        statusMessage: "Success"
+                    }
                 };
             });
             const results = await request.send(newRequest);

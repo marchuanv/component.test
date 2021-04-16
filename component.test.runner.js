@@ -35,8 +35,9 @@ module.exports = {
             if (passphrase) {
                 newRequest.headers.passphrase = passphrase;
             }
-            component.receiveDependantComponentNotifications(() => {
+            component.receiveDependantComponentNotifications(null, async() => {
                 return {
+                    success: true,
                     statusCode: 200,
                     statusMessage: "Success",
                     headers: {}

@@ -35,27 +35,18 @@ module.exports = {
             if (passphrase) {
                 newRequest.headers.passphrase = passphrase;
             }
-            component.receiveDependantComponentNotifications(null, async() => {
+            component.subscribe(null, async() => {
                 return {
                     success: true,
-                    statusCode: 200,
-                    statusMessage: "Success",
-                    headers: {}
+                    reasons: [],
+                    message: "Success"
                 };
             });
             const results = await request.send(newRequest);
             if (results.statusCode === statusCode && results.statusMessage === statusMessage){
-                await resolve( utils.getJSONString({ 
-                    status: "Passed",
-                    componentName, 
-                    response: results
-                }));
+                await resolve( utils.getJSONString(results));
             } else {
-                await reject( utils.getJSONString({ 
-                    status: "Failed",
-                    componentName, 
-                    response: results
-                }));
+                await reject( utils.getJSONString(results));
             }
             complete();
         });

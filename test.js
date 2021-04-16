@@ -2,12 +2,12 @@ const testRunner = require("./component.test.runner");
 
 ( async () => {
     await testRunner.runTest({ componentName: "component.request.handler", requestPath: "/request"});
-    await testRunner.runTest({ componentName: "component.request.handler.deferred", requestPath: "/deferred"});
+    // await testRunner.runTest({ componentName: "component.request.handler.deferred", requestPath: "/deferred"});
     
     //Test with user headers
-    await testRunner.runTest({ componentName: "component.request.handler.user", requestPath: "/user", username: "joe", statusCode: 200, statusMessage: "Success" });
+    // await testRunner.runTest({ componentName: "component.request.handler.user", requestPath: "/user", username: "joe", statusCode: 200, statusMessage: "Success" });
     //Test without user headers
-    await testRunner.runTest({ componentName: "component.request.handler.user", requestPath: "/user", statusCode: 400, statusMessage: "Bad Request" });
+    // await testRunner.runTest({ componentName: "component.request.handler.user", requestPath: "/user", statusCode: 400, statusMessage: "Bad Request" });
     
     // //No Routes
     // await testRunner.runTest({ componentName: "component.request.handler.route", username: "joe", requestPath: "/test", statusCode: 404, statusMessage: "Not Found" });

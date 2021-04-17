@@ -36,7 +36,6 @@ module.exports = {
                 newRequest.headers.passphrase = passphrase;
             }
             component.subscribe(null, async() => {
-                throw new Error("bla bla bla");
                 return {
                     success: true,
                     reasons: [],
@@ -47,7 +46,7 @@ module.exports = {
                     }
                 };
             });
-            const results = await request.send(newRequest);
+            const results = await component.publish("test");
             if (results.statusCode === statusCode && results.statusMessage === statusMessage){
                 await resolve( utils.getJSONString(results));
             } else {

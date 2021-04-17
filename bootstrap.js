@@ -9,7 +9,6 @@ const bootstrap = (moduleName) => {
             }
             lockTest = true;
             clearInterval(id);
-            const { request } = await component.load("component.request");
             let packageJson = require("./package.json");
             module.path = module.path.replace(packageJson.name,`${moduleName}.proxy`);
             packageJson.name = `${moduleName}.proxy`;
@@ -20,7 +19,6 @@ const bootstrap = (moduleName) => {
             componentUnderTestProxy.config.dependencies = [];
             componentUnderTestProxy.config.dependencies.push({ moduleName: componentUnderTest.name });
             const results = {
-                request: request.exports,
                 component: componentUnderTestProxy,
                 complete: () => {
                     lockTest = false;

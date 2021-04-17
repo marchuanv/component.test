@@ -1,7 +1,6 @@
 const testRunner = require("./component.test.runner");
 
 ( async () => {
-    await testRunner.runTest({ componentName: "component.request.handler", requestPath: "/request"});
     await testRunner.runTest({ componentName: "component.request.handler.deferred", requestPath: "/deferred"});
     
     //Test with user headers

@@ -24,9 +24,5 @@
     "component": "marchuanv/component",
     "utils": "marchuanv/utils"
   },
-  "component": {
-    "channel": 3000,
-    "subscribers": [],
-    "dependencies": []
-  }
+  "component": {}
 }

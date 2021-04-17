@@ -36,6 +36,7 @@ module.exports = {
                 newRequest.headers.passphrase = passphrase;
             }
             component.subscribe(null, async() => {
+                throw new Error("bla bla bla");
                 return {
                     success: true,
                     reasons: [],

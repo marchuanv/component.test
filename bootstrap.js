@@ -9,17 +9,10 @@ const bootstrap = (moduleName) => {
             }
             lockTest = true;
             clearInterval(id);
-            let packageJson = require("./package.json");
-            module.path = module.path.replace(packageJson.name,`${moduleName}.proxy`);
-            packageJson.name = `${moduleName}.proxy`;
             let componentUnderTest = await component.load(moduleName);
             componentUnderTest = componentUnderTest[componentUnderTest.name];
-            let componentUnderTestProxy = await component.load(module);
-            componentUnderTestProxy = componentUnderTestProxy[componentUnderTestProxy.name];
-            componentUnderTestProxy.config.dependencies = [];
-            componentUnderTestProxy.config.dependencies.push({ moduleName: componentUnderTest.name });
             const results = {
-                component: componentUnderTestProxy,
+                component: componentUnderTest,
                 complete: () => {
                     lockTest = false;
                 }

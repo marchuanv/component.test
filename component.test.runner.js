@@ -46,8 +46,8 @@ module.exports = {
                     }
                 };
             });
-            const results = await component.publish("test");
-            if (results.statusCode === statusCode && results.statusMessage === statusMessage){
+            const results = await component.publish({ text:"test", headers: {} });
+            if (results.success){
                 await resolve( utils.getJSONString(results));
             } else {
                 await reject( utils.getJSONString(results));

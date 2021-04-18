@@ -24,5 +24,8 @@
     "component": "marchuanv/component",
     "utils": "marchuanv/utils"
   },
-  "component": {}
+  "component": {
+    "priority": 2,
+    "index": 1
+  }
 }

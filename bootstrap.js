@@ -9,16 +9,12 @@ const bootstrap = (moduleName) => {
             }
             lockTest = true;
             clearInterval(id);
-            let componentUnderTest = await component.load(moduleName);
-            componentUnderTest = componentUnderTest[componentUnderTest.name];
-            const results = {
-                component: componentUnderTest,
-                complete: () => {
-                    lockTest = false;
-                }
-            };
-            results[componentUnderTest.config.friendlyName] = componentUnderTest;
-            await resolve(results);
+            component.load("component.test").then(async ({test}) => {
+                await component.load(moduleName);
+                test.config.dependencies.push({moduleName});
+                const results = { test, complete: () => lockTest = false };
+                await resolve(results);
+            });
         },1000);
     });
 };

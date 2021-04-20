@@ -1,21 +1,19 @@
 const { bootstrap } = require("./bootstrap.js");
 const utils = require("utils");
 module.exports = {
-    runTest: ( { componentName, requestPath, username, passphrase, inputData = "", isNewRouteroute = false, statusCode = 200, statusMessage = "Success" }) => {
+    runTest: ({componentName}) => {
         return new Promise(async (resolve, reject) => {
             const { test, complete } = await bootstrap(componentName);
-            test.subscribe(null, async() => {
+            test.subscribe({ callback: async() => {
                 return {
+                    headers: {},
                     success: true,
-                    reasons: [],
-                    message: {
-                        headers: {},
-                        statusCode: 200,
-                        statusMessage: "Success"
-                    }
+                    data: {},
+                    statusCode: 200,
+                    statusMessage: "Success"
                 };
-            });
-            const results = await test.publish({ text:"test", headers: {} });
+            }});
+            const results = await test.publish({ headers: {}, data: {} });
             if (results.success){
                 await resolve( utils.getJSONString(results));
             } else {

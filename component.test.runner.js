@@ -18,7 +18,7 @@ module.exports = {
             };
             await test.subscribe(messageBusSubscription);
             await test.publish(publishMessage);
-            console.log("Test Executed");
+            console.log("Test Executed. Published Message State:", publishMessage.clone());
         });
     }
 }

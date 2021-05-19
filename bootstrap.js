@@ -1,4 +1,5 @@
 const component = require("component");
+const { MessageBusMessage, MessageBusMessageStatus, MessageBusSubscription } = require("component");
 let lockTest = false;
 
 const bootstrap = (moduleName) => {
@@ -10,10 +11,10 @@ const bootstrap = (moduleName) => {
             lockTest = true;
             clearInterval(id);
             component.load("component.test").then(async ({test}) => {
-                await component.load(moduleName);
+                let componentUnderTest = await component.load(moduleName);
+                componentUnderTest = componentUnderTest[componentUnderTest.name];
                 test.config.dependencies.push({moduleName});
-                const results = { test, complete: () => lockTest = false };
-                await resolve(results);
+                await resolve({ test, componentUnderTest, complete: () => lockTest = false, MessageBusMessage, MessageBusMessageStatus, MessageBusSubscription });
             });
         },1000);
     });

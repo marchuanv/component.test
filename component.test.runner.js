@@ -3,22 +3,12 @@ const utils = require("utils");
 module.exports = {
     runTest: ({componentName}) => {
         return new Promise(async (resolve) => {
-            const { test, complete,  MessageBusMessage, MessageBusSubscription, MessageBusMessageStatus } = await bootstrap(componentName);
-            const messageBusSubscription = new MessageBusSubscription();
+            const { test, complete,  MessageBusMessage } = await bootstrap(componentName);
             const publishMessage = new MessageBusMessage({});
-
-            messageBusSubscription.callback = (incomingMessageBusMessage) => {
-                if (incomingMessageBusMessage.Id !== publishMessage.Id) {
-                    throw new Error("test failed");
-                }
-                resolve();
-                complete();
-                incomingMessageBusMessage.status = MessageBusMessageStatus.Success;
-                return incomingMessageBusMessage;
-            };
-            await test.subscribe(messageBusSubscription);
             await test.publish(publishMessage);
-            console.log("Test Executed. Published Message State:", publishMessage.clone());
+            console.log("Test Executed. Published Message State:", JSON.stringify(publishMessage.clone(), null, 4));
+            resolve();
+            complete();
         });
     }
 }
